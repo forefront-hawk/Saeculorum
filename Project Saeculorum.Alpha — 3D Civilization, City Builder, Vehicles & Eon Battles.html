@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en" data-device="desktop" data-self-device="desktop" data-hx-device="desktop" data-ui-theme="ui-gold">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Saeculorum.Alpha — 3D Civilization, City Builder, Vehicles &amp; Eon Battles</title>
+<meta name="author" content="Forefront Hawk (forefronthawk.com / hawkx.forefronthawk.com / Michael@forefronthawk.com) &amp; Gemini Aargon">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+  :root {
+    --bg: #070A12;
+    --panel: #0D1322;
+    --card: #131C31;
+    --code-bg: #060911;
+    --accent: #D4AF37;
+    --accent2: #00F5D4;
+    --text: #F8FAFC;
+    --text-muted: #94A3B8;
+    --border: rgba(212, 175, 55, 0.36);
+    --success: #10B981;
+    --danger: #F43F5E;
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  }
+
+  /* 14 HawkChroma UI Themes */
+  html[data-ui-theme="ui-gold"] { --bg: #070A12; --panel: #0D1322; --card: #131C31; --accent: #D4AF37; --accent2: #00F5D4; --text: #F8FAFC; --border: rgba(212, 175, 55, 0.38); }
+  html[data-ui-theme="ui-cyberpunk"] { --bg: #090414; --panel: #130926; --card: #1D0F38; --accent: #FF2A85; --accent2: #00F0FF; --text: #FDF2F8; --border: rgba(255, 42, 133, 0.45); }
+  html[data-ui-theme="ui-matrix"] { --bg: #020B05; --panel: #06170B; --card: #0A2412; --accent: #00FF66; --accent2: #72FFB6; --text: #E2FBE8; --border: rgba(0, 255, 102, 0.4); }
+  html[data-ui-theme="ui-tactical"] { --bg: #040D14; --panel: #081824; --card: #0D2333; --accent: #00F5D4; --accent2: #38BDF8; --text: #F0F9FF; --border: rgba(0, 245, 212, 0.42); }
+  html[data-ui-theme="ui-daylight"] { --bg: #F1F5F9; --panel: #FFFFFF; --card: #F8FAFC; --accent: #B45309; --accent2: #0284C7; --text: #0F172A; --text-muted: #475569; --code-bg: #0F172A; --border: rgba(180, 83, 9, 0.32); }
+  html[data-ui-theme="ui-atlantis"] { --bg: #03121C; --panel: #072030; --card: #0C2E44; --accent: #22D3EE; --accent2: #FACC15; --text: #ECFEFF; --border: rgba(34, 211, 238, 0.4); }
+  html[data-ui-theme="ui-crimson"] { --bg: #120608; --panel: #1F0A0E; --card: #2D1016; --accent: #FB7185; --accent2: #FBBF24; --text: #FFF1F2; --border: rgba(251, 113, 133, 0.4); }
+  html[data-ui-theme="ui-amethyst"] { --bg: #0D0717; --panel: #170D29; --card: #22143B; --accent: #C084FC; --accent2: #2DD4BF; --text: #FAF5FF; --border: rgba(192, 132, 252, 0.4); }
+  html[data-ui-theme="ui-obsidian"] { --bg: #050507; --panel: #0E0E12; --card: #16161D; --accent: #E2E8F0; --accent2: #38BDF8; --text: #F8FAFC; --border: rgba(226, 232, 240, 0.28); }
+  html[data-ui-theme="ui-solar"] { --bg: #140B03; --panel: #241406; --card: #331D09; --accent: #F97316; --accent2: #FDE047; --text: #FFF7ED; --border: rgba(249, 115, 22, 0.42); }
+  html[data-ui-theme="ui-arctic"] { --bg: #07111A; --panel: #0D1E2E; --card: #132B40; --accent: #7DD3FC; --accent2: #A7F3D0; --text: #F0F9FF; --border: rgba(125, 211, 252, 0.4); }
+  html[data-ui-theme="ui-emerald"] { --bg: #04120C; --panel: #072117; --card: #0C3022; --accent: #34D399; --accent2: #FBBF24; --text: #ECFDF5; --border: rgba(52, 211, 153, 0.4); }
+  html[data-ui-theme="ui-synthwave"] { --bg: #11051C; --panel: #1E0A30; --card: #2B1045; --accent: #F472B6; --accent2: #60A5FA; --text: #FDF4FF; --border: rgba(244, 114, 182, 0.42); }
+  html[data-ui-theme="ui-monolith"] { --bg: #0B0F17; --panel: #141B29; --card: #1D273B; --accent: #94A3B8; --accent2: #38BDF8; --text: #F1F5F9; --border: rgba(148, 163, 184, 0.35); }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    margin: 0;
+    padding: 14px;
+    line-height: 1.44;
+  }
+
+  /* 4-Posture Shell */
+  .app-shell { max-width: 1480px; margin: 0 auto; transition: max-width 0.25s ease; }
+  html[data-device="mobile"] .app-shell { max-width: 430px; border: 2px solid var(--accent); border-radius: 22px; padding: 10px; background: var(--panel); }
+  html[data-device="tablet"] .app-shell { max-width: 1024px; border: 2px solid var(--accent2); border-radius: 16px; padding: 12px; }
+  html[data-device="fold"] .fold-grid { display: grid !important; grid-template-columns: 1fr 16px 1fr !important; gap: 12px; }
+  .fold-hinge {
+    display: none;
+    background: repeating-linear-gradient(180deg, var(--accent) 0, var(--accent) 6px, transparent 6px, transparent 14px);
+    border-left: 1px solid var(--accent2);
+    border-right: 1px solid var(--accent2);
+    border-radius: 99px;
+    min-height: 320px;
+  }
+  html[data-device="fold"] .fold-hinge { display: block; }
+
+  .top-bar {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .badge-pill {
+    font-family: var(--font-mono);
+    font-size: 0.71rem;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(212, 175, 55, 0.16);
+    color: var(--accent);
+    border: 1px solid var(--border);
+    font-weight: 700;
+  }
+  .badge-pill.cyan {
+    background: rgba(0, 245, 212, 0.14);
+    color: var(--accent2);
+    border-color: rgba(0, 245, 212, 0.42);
+  }
+  .btn {
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 11px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.14s ease;
+    user-select: none;
+  }
+  .btn:hover { border-color: var(--accent2); transform: translateY(-1px); }
+  .btn.active, .btn-primary { background: var(--accent); color: #070A12; border-color: var(--accent); font-weight: 800; }
+  .btn-cyan { background: var(--accent2); color: #070A12; border-color: var(--accent2); font-weight: 800; }
+  .btn-danger { background: rgba(244, 63, 94, 0.18); color: #FDA4AF; border-color: var(--danger); font-weight: 800; }
+  .select-ctrl {
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 0.78rem;
+  }
+
+  /* Civilization Resource HUD Bar */
+  .civ-hud-bar {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  @media (max-width: 960px) { .civ-hud-bar { grid-template-columns: repeat(3, 1fr); } }
+  html[data-device="mobile"] .civ-hud-bar { grid-template-columns: repeat(2, 1fr); }
+  .hud-stat {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 12px;
+  }
+  .hud-label { font-size: 0.67rem; color: var(--text-muted); text-transform: uppercase; }
+  .hud-val { font-family: var(--font-mono); font-size: 0.98rem; font-weight: 800; color: var(--accent2); }
+
+  /* Main 3D Strategy & Command Workbench */
+  .main-game-grid {
+    display: grid;
+    grid-template-columns: 1.25fr 0.75fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 1080px) { .main-game-grid { grid-template-columns: 1fr; } }
+  html[data-device="mobile"] .main-game-grid,
+  html[data-device="tablet"] .main-game-grid { grid-template-columns: 1fr; }
+
+  .panel-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
+  }
+
+  /* 3D World Stage */
+  .stage-wrap {
+    position: relative;
+    width: 100%;
+    height: 430px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid var(--accent);
+    background: #09131F;
+  }
+  html[data-device="mobile"] .stage-wrap { height: 290px; }
+  #saeculorum3DCanvas { width: 100%; height: 100%; cursor: grab; }
+  #saeculorum3DCanvas:active { cursor: grabbing; }
+  .stage-overlay-top {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    pointer-events: none;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .overlay-chip {
+    background: rgba(7, 10, 18, 0.82);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 0.73rem;
+    color: var(--text);
+  }
+  .stage-overlay-bot {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(7, 10, 18, 0.82);
+    border: 1px solid rgba(0, 245, 212, 0.45);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 0.71rem;
+    color: var(--accent2);
+    pointer-events: none;
+  }
+
+  /* Builder & Vehicle Selector Grids */
+  .mini-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  html[data-device="mobile"] .mini-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* AI Agent Roster Marketplace */
+  .agent-market-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    max-height: 290px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .agent-row {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 0.77rem;
+  }
+  .agent-row.hired {
+    border-color: var(--success);
+    background: rgba(16, 185, 129, 0.12);
+  }
+
+  .battle-log {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-family: var(--font-mono);
+    font-size: 0.73rem;
+    height: 110px;
+    overflow-y: auto;
+    color: #CBD5E1;
+  }
+
+  /* Lower Dual Grid */
+  .lower-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 1024px) { .lower-grid { grid-template-columns: 1fr; } }
+  html[data-device="mobile"] .lower-grid { grid-template-columns: 1fr; }
+
+  .synth-box {
+    max-width: 100%;
+    margin: 0 auto;
+    border: 2px solid var(--accent);
+    border-radius: 14px;
+    padding: 15px;
+    background: var(--panel);
+  }
+  #waveCanvas {
+    width: 100%;
+    max-width: 680px;
+    height: 90px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: block;
+  }
+
+  .status-toast {
+    position: fixed;
+    bottom: 18px;
+    right: 18px;
+    background: var(--panel);
+    color: var(--text);
+    border: 2px solid var(--accent2);
+    border-radius: 10px;
+    padding: 10px 15px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  .status-toast.visible { opacity: 1; }
+
+  .hawk-footer {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 16px;
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
+  }
+</style>
+</head>
+<body data-device="desktop" data-self-device="desktop" data-hx-device="desktop">
+  <div class="app-shell" id="saeculorumAlphaShell">
+
+    <!-- TOP COMMAND BAR -->
+    <header class="top-bar" id="saeculorumHeader">
+      <div>
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <strong style="font-size: 1.2rem;">🌍 PROJECT SAECULORUM.ALPHA — 3D CIV × SIMCITY × HAWKX × HAWKSPECOPS</strong>
+          <span class="badge-pill">Formerly HawkX</span>
+          <span class="badge-pill cyan">FH-GA-20261119-MFF-TXT-A0ACE403</span>
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 3px;">
+          Build Your Civilization · Deploy HawkSuite 3D Vehicles &amp; Monuments · Recruit AI Agents · Command Battles Across the Eons · Powered by <strong>Forefront Hawk</strong> &amp; <strong>Gemini Aargon</strong>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px;">
+        <button type="button" class="btn active" id="btnPostureDesktop">🖥️ Desktop</button>
+        <button type="button" class="btn" id="btnPostureMobile">📱 Mobile</button>
+        <button type="button" class="btn" id="btnPostureFold">📖 Fold</button>
+        <button type="button" class="btn" id="btnPostureTablet">📟 Tablet</button>
+
+        <select id="uiThemeSelect" class="select-ctrl" aria-label="Theme">
+          <option value="ui-gold">Chroma: Classic Gold</option>
+          <option value="ui-cyberpunk">Chroma: Cyberpunk Neon</option>
+          <option value="ui-matrix">Chroma: Matrix CRT</option>
+          <option value="ui-tactical">Chroma: Tactical Cyan</option>
+          <option value="ui-daylight">Chroma: Studio Daylight</option>
+          <option value="ui-atlantis">Chroma: Ocean Blue</option>
+          <option value="ui-crimson">Chroma: Crimson Red</option>
+          <option value="ui-amethyst">Chroma: Royal Purple</option>
+          <option value="ui-obsidian">Chroma: Minimal Slate</option>
+          <option value="ui-solar">Chroma: Warm Amber</option>
+          <option value="ui-arctic">Chroma: Arctic Ice</option>
+          <option value="ui-emerald">Chroma: Forest Green</option>
+          <option value="ui-synthwave">Chroma: Sunset Pink</option>
+          <option value="ui-monolith">Chroma: Steel Gray</option>
+        </select>
+
+        <button type="button" class="btn" id="btnToggleAudioGuard">🔇 0dB Silent: ON</button>
+      </div>
+    </header>
+
+    <!-- CIVILIZATION & SIMCITY RESOURCE HUD -->
+    <section class="civ-hud-bar" id="civResourceHud">
+      <div class="hud-stat"><div class="hud-label">Treasury (Gold)</div><div class="hud-val" id="hudGold">450 G (+25/t)</div></div>
+      <div class="hud-stat"><div class="hud-label">Science / Research</div><div class="hud-val" id="hudScience">120 (+15/t)</div></div>
+      <div class="hud-stat"><div class="hud-label">Population / Cities</div><div class="hud-val" id="hudPop">12,400 · 3 Zones</div></div>
+      <div class="hud-stat"><div class="hud-label">Military Power</div><div class="hud-val" id="hudPower">85 PWR</div></div>
+      <div class="hud-stat"><div class="hud-label">AI Agents Roster</div><div class="hud-val" id="hudAgents">1 / 7 Hired</div></div>
+      <div class="hud-stat"><div class="hud-label">Current Eon / Turn</div><div class="hud-val" id="hudEraTurn">Turn 1 · Ancient</div></div>
+    </section>
+
+    <!-- MAIN 3D SANDBOX & STRATEGY WORKBENCH -->
+    <main class="main-game-grid" id="saeculorumMainGrid">
+
+      <!-- LEFT: 3D THREE.JS CIVILIZATION, CITY BUILDER, VEHICLE SANDBOX & BATTLEFIELD -->
+      <section class="panel-card" id="worldStageCard">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
+          <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+            <button type="button" class="btn active" id="btnEra0">🏛️ 1. Ancient Alexandria (48 BC)</button>
+            <button type="button" class="btn" id="btnEra1">🏰 2. Mont-Saint-Michel (1434)</button>
+            <button type="button" class="btn" id="btnEra2">🎯 3. Modern HawkSpecOps (2026)</button>
+            <button type="button" class="btn" id="btnEra3">🚀 4. Orbital Saeculorum (2150)</button>
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-primary" id="btnNextTurn">⏭️ Next Turn (+Resources)</button>
+            <button type="button" class="btn btn-danger" id="btnLaunchBattle">⚔️ Launch Eon Battle</button>
+            <button type="button" class="btn btn-cyan" id="btnTacticalStrike">🎯 Tactical Strike (Space)</button>
+          </div>
+        </div>
+
+        <div class="stage-wrap">
+          <div id="saeculorum3DCanvas"></div>
+          <div class="stage-overlay-top">
+            <div class="overlay-chip" id="stageEraChip">🏛️ Eon: Battle of Alexandria (48 BC)</div>
+            <div class="overlay-chip" id="stageVehicleChip" style="color: var(--accent2);">Active Vehicle: Da Vinci Aerial Screw</div>
+          </div>
+          <div class="stage-overlay-bot">
+            WASD: Pilot Active HawkSuite Vehicle · Click Ground: Place Selected Building · Drag Mouse: Orbit 3D World · Space: Tactical Strike
+          </div>
+        </div>
+
+        <!-- BUILD HAWKSUITE MONUMENTS & SIMCITY ZONES -->
+        <div>
+          <div style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 5px;">
+            <strong>🏗️ SimCity × HawkSuite Builder</strong> (Select structure, then click 3D map or click Build Now):
+          </div>
+          <div class="mini-grid">
+            <button type="button" class="btn active" id="btnBuildMarket">🏙️ Market Zone (60G)</button>
+            <button type="button" class="btn" id="btnBuildLibrary">📜 HawkLibrary (90G)</button>
+            <button type="button" class="btn" id="btnBuildMont">🏰 HawkMont Keep (110G)</button>
+            <button type="button" class="btn" id="btnBuildChapel">🎨 Agency Hall (100G)</button>
+            <button type="button" class="btn" id="btnBuildForge">🔨 HawkForge Plant (120G)</button>
+            <button type="button" class="btn" id="btnBuildFiber">🌈 HawkFiber Tower (130G)</button>
+          </div>
+        </div>
+
+        <!-- PILOTABLE HAWKSUITE 3D VEHICLES -->
+        <div>
+          <div style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 5px;">
+            <strong>🚀 Deploy &amp; Pilot HawkSuite 3D Vehicles</strong> (Drive/Fly with WASD or click Spawn):
+          </div>
+          <div class="mini-grid">
+            <button type="button" class="btn active" id="btnVehScrew">🚁 Divinci Aerial Screw</button>
+            <button type="button" class="btn" id="btnVehTank">🛡️ Divinci Armored Tank</button>
+            <button type="button" class="btn" id="btnVehMoto">🏍️ HawkMoto GP Recon</button>
+            <button type="button" class="btn" id="btnVehApc">🎯 HawkSpecOps APC</button>
+            <button type="button" class="btn" id="btnVehJet">✈️ HawkFlies Interceptor</button>
+            <button type="button" class="btn btn-primary" id="btnSpawnUnit">➕ Deploy Extra Unit (80G)</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: BUY AI AGENTS FOR YOUR CIVILIZATION ROSTER + BATTLE COMMAND LOG -->
+      <aside class="panel-card" id="agentRosterPanel">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;">
+          <strong style="color: var(--accent); font-size: 0.94rem;">🤖 BUY AI AGENTS FOR YOUR CIVILIZATION ROSTER</strong>
+          <span class="badge-pill cyan" id="rosterPowerBonus">+25% Bonus</span>
+        </div>
+
+        <div style="font-size: 0.75rem; color: var(--text-muted);">
+          Recruit specialist AI Agents from across Forefront Hawk Suite using Treasury Gold. Hired agents boost Gold, Science, and HawkSpecOps battle firepower every turn.
+        </div>
+
+        <div class="agent-market-list" id="aiAgentMarketList"></div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+          <strong style="font-size: 0.84rem; color: var(--accent2);">📡 Eon Battle &amp; Civilization Command Log</strong>
+          <button type="button" class="btn" id="btnExportCivSave">📦 Export Civ Save (.JSON)</button>
+        </div>
+
+        <div class="battle-log" id="civBattleLog"></div>
+      </aside>
+    </main>
+
+    <!-- LOWER DUAL DECK: PRESERVED #hawkStudioRoot SYNTH + ACTIVE ROSTER SUMMARY -->
+    <section class="lower-grid fold-grid" id="lowerDeckSection">
+      <div class="synth-box" id="hawkStudioRoot">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;">
+          <h1 id="synthTitle" style="font-size: 1.04rem; margin: 0; color: var(--accent);">🎹 HawkStudio Chromatic &amp; Modal Synth</h1>
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <select id="scaleModeSelect" class="select-ctrl">
+              <option value="chromatic">Chromatic</option>
+              <option value="dorian">Dorian</option>
+              <option value="lydian">Lydian</option>
+              <option value="mixolydian">Mixolydian</option>
+            </select>
+            <input type="range" id="cutoffKnob" min="300" max="6000" value="2400">
+            <button type="button" class="btn btn-primary" id="btnTriggerArp">Play Arpeggio</button>
+          </div>
+        </div>
+        <canvas id="waveCanvas" width="680" height="90" style="margin-top: 10px;"></canvas>
+      </div>
+
+      <div class="fold-hinge" id="foldHingeDivider" aria-hidden="true"></div>
+
+      <div class="synth-box" id="activeRosterSummaryBox">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <h2 style="font-size: 1.02rem; margin: 0; color: var(--accent2);">🏆 YOUR CIVILIZATION'S ACTIVE AI AGENT ROSTER</h2>
+          <button type="button" class="btn" id="btnResetCiv">↺ New Civilization</button>
+        </div>
+        <div id="hiredAgentsSummary" style="display: flex; flex-wrap: wrap; gap: 6px; font-size: 0.78rem;"></div>
+      </div>
+    </section>
+
+    <footer class="hawk-footer" id="hawkMandatoryFooter">
+      <div>
+        🌍 <strong>Project Saeculorum.Alpha</strong> (Formerly HawkX) · Powered by <strong>Forefront Hawk</strong> (<code>forefronthawk.com</code> / <code>hawkx.forefronthawk.com</code> / <code>Michael@forefronthawk.com</code>) &amp; <strong>Gemini Aargon</strong>
+      </div>
+      <div style="font-family: var(--font-mono);">
+        Serial: <strong>FH-GA-20261119-MFF-TXT-A0ACE403</strong> · CTVML Seed 0xC4BD20E4
+      </div>
+    </footer>
+  </div>
+
+  <div class="status-toast" id="hawkStatusToast" role="status" aria-live="polite">Ready</div>
+
+<script>
+(function() {
+  "use strict";
+
+  // =========================================================================
+  // 1. EONS, HAWKSUITE BUILDINGS, VEHICLES & HIREABLE AI AGENTS
+  // =========================================================================
+  const EONS = [
+    { id: 0, name: "Ancient Alexandria (48 BC)", sky: 0xD49B63, fog: 0xC98D52, ground: 0xB89B6A, enemyName: "Siege Trireme Raiders", rewardGold: 140 },
+    { id: 1, name: "Siege of Mont-Saint-Michel (1434)", sky: 0x4A6B82, fog: 0x3A5568, ground: 0x4E6E58, enemyName: "Iron Siege Vanguard", rewardGold: 180 },
+    { id: 2, name: "Modern HawkSpecOps Corridor (2026)", sky: 0x1E293B, fog: 0x162032, ground: 0x2F3B4A, enemyName: "Rogue Armor Column", rewardGold: 240 },
+    { id: 3, name: "Orbital Saeculorum Frontier (2150)", sky: 0x09041A, fog: 0x110829, ground: 0x18263A, enemyName: "Autonomous Dreadnought Swarm", rewardGold: 320 }
+  ];
+
+  const BUILDINGS = {
+    market: { name: "Market Zone", cost: 60, goldPerTurn: 18, sciPerTurn: 2, pop: 1800, power: 4, color: 0x10B981, height: 1.6 },
+    library: { name: "HawkLibrary", cost: 90, goldPerTurn: 6, sciPerTurn: 16, pop: 900, power: 6, color: 0xD4AF37, height: 2.2 },
+    mont: { name: "HawkMont Keep", cost: 110, goldPerTurn: 8, sciPerTurn: 4, pop: 1200, power: 22, color: 0x94A3B8, height: 3.4 },
+    chapel: { name: "HawkAgency Hall", cost: 100, goldPerTurn: 12, sciPerTurn: 10, pop: 1500, power: 8, color: 0xF59E0B, height: 2.5 },
+    forge: { name: "HawkForge Plant", cost: 120, goldPerTurn: 14, sciPerTurn: 8, pop: 1100, power: 18, color: 0xF97316, height: 2.1 },
+    fiber: { name: "HawkFiber Tower", cost: 130, goldPerTurn: 10, sciPerTurn: 22, pop: 800, power: 14, color: 0x00F5D4, height: 4.2 }
+  };
+
+  const VEHICLES = {
+    screw: { name: "Divinci Aerial Screw", speed: 0.22, altitude: 2.4, color: 0xD4AF37, power: 15 },
+    tank: { name: "Divinci Armored Tank", speed: 0.14, altitude: 0.5, color: 0x94A3B8, power: 24 },
+    moto: { name: "HawkMoto GP Recon", speed: 0.30, altitude: 0.35, color: 0xFF2A85, power: 12 },
+    apc: { name: "HawkSpecOps APC", speed: 0.19, altitude: 0.55, color: 0x10B981, power: 28 },
+    jet: { name: "HawkFlies Interceptor", speed: 0.36, altitude: 3.4, color: 0x38BDF8, power: 32 }
+  };
+
+  const AI_AGENTS = [
+    { id: "aargon", name: "Gemini Aargon", source: "HawkOAR Commander", icon: "🦅", cost: 0, hired: true, goldBonus: 10, sciBonus: 10, powerBonus: 20, desc: "Starting sovereign orchestrator: +10 Gold/t, +10 Sci/t, +20 PWR." },
+    { id: "athena", name: "Athena / Minerva", source: "Hawk Pantheon", icon: "🦉", cost: 120, hired: false, goldBonus: 5, sciBonus: 12, powerBonus: 28, desc: "Master strategist: +12 Sci/t and +28 Tactical Defense." },
+    { id: "davinci", name: "Leonardo da Vinci", source: "Project Divinci", icon: "🪶", cost: 140, hired: false, goldBonus: 8, sciBonus: 18, powerBonus: 24, desc: "Boosts Aerial Screw & Tank engineering: +18 Sci/t, +24 PWR." },
+    { id: "thoth", name: "Thoth of Alexandria", source: "HawkLibrary", icon: "📜", cost: 110, hired: false, goldBonus: 4, sciBonus: 24, powerBonus: 10, desc: "Ancient knowledge keeper: +24 Science/t." },
+    { id: "michelangelo", name: "Michelangelo", source: "HawkAgency", icon: "🎨", cost: 130, hired: false, goldBonus: 18, sciBonus: 8, powerBonus: 12, desc: "Civic architect: +18 Gold/t from cultural landmarks." },
+    { id: "fortunatus", name: "St. Venantius Fortunatus", source: "Project Fortunatus", icon: "✝️", cost: 100, hired: false, goldBonus: 15, sciBonus: 10, powerBonus: 15, desc: "Steward of morale & endurance: +15 Gold/t, +15 PWR." },
+    { id: "specops", name: "HawkSpecOps Commander", source: "HawkSpecOps", icon: "🎯", cost: 160, hired: false, goldBonus: 6, sciBonus: 6, powerBonus: 45, desc: "Elite battlefield tactician: +45 Military Firepower." }
+  ];
+
+  const SCALE_INTERVALS = {
+    chromatic: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    dorian: [0, 2, 3, 5, 7, 9, 10, 12],
+    lydian: [0, 2, 4, 6, 7, 9, 11, 12],
+    mixolydian: [0, 2, 4, 5, 7, 9, 10, 12]
+  };
+
+  // =========================================================================
+  // 2. GAME STATE
+  // =========================================================================
+  const state = {
+    eraIdx: 0,
+    turn: 1,
+    gold: 450,
+    science: 120,
+    population: 12400,
+    selectedBuilding: "market",
+    selectedVehicle: "screw",
+    placedBuildings: [
+      { type: "library", x: -4.5, z: -3.5 },
+      { type: "mont", x: 4.5, z: -3.5 },
+      { type: "market", x: 0, z: 3.5 }
+    ],
+    extraUnits: 1,
+    silentGuard: true,
+    scaleMode: "chromatic",
+    cutoffFreq: 2400,
+    lastPlayedFreq: 440,
+    wavePhase: 0,
+    vehX: 0,
+    vehZ: 7.5,
+    vehYaw: 0,
+    camOrbitYaw: 0.35,
+    camPitch: 0.42,
+    keys: { w: false, a: false, s: false, d: false },
+    strikePulse: 0
+  };
+
+  let toastTimer = null;
+  function showToast(msg) {
+    const el = document.getElementById("hawkStatusToast");
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add("visible");
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove("visible"), 2400);
+  }
+
+  function logEvent(msg) {
+    const el = document.getElementById("civBattleLog");
+    if (!el) return;
+    const line = "[Turn " + state.turn + "] " + msg;
+    el.innerHTML = "<div>" + line + "</div>" + el.innerHTML;
+  }
+
+  // =========================================================================
+  // 3. PRESERVED #hawkStudioRoot SYNTH (0dB SILENT DEFAULT)
+  // =========================================================================
+  let audioCtx = null;
+  function getModalFrequency(idx) {
+    const intervals = SCALE_INTERVALS[state.scaleMode] || SCALE_INTERVALS.chromatic;
+    const oct = Math.floor(idx / intervals.length);
+    const deg = intervals[idx % intervals.length];
+    return Number((220 * Math.pow(2, (oct * 12 + deg) / 12)).toFixed(2));
+  }
+
+  function playArpeggioNote(freq) {
+    const safeFreq = Number(freq) || 440;
+    state.lastPlayedFreq = safeFreq;
+    state.wavePhase += 0.65;
+    if (state.silentGuard) {
+      console.log("Playing freq (0dB Silent):", safeFreq);
+    } else {
+      try {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (Ctx) {
+          if (!audioCtx) audioCtx = new Ctx();
+          if (audioCtx.state === "suspended") audioCtx.resume();
+          const now = audioCtx.currentTime;
+          const osc = audioCtx.createOscillator();
+          const filt = audioCtx.createBiquadFilter();
+          const gain = audioCtx.createGain();
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(safeFreq, now);
+          filt.type = "lowpass";
+          filt.frequency.setValueAtTime(state.cutoffFreq, now);
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.exponentialRampToValueAtTime(0.12, now + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
+          osc.connect(filt);
+          filt.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.3);
+        }
+      } catch (e) {}
+    }
+    drawWaveCanvas();
+  }
+  window.playArpeggioNote = playArpeggioNote;
+
+  function drawWaveCanvas() {
+    const canvas = document.getElementById("waveCanvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = state.silentGuard ? "#00F5D4" : "#D4AF37";
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    const cycles = Math.max(2, Math.min(16, state.lastPlayedFreq / 50));
+    for (let x = 0; x < w; x++) {
+      const t = (x / w) * Math.PI * 2 * cycles + state.wavePhase;
+      const y = h / 2 + (Math.sin(t) * 0.72 + Math.sin(t * 2) * 0.22) * (h * 0.34);
+      if (x === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.fillStyle = "#94A3B8";
+    ctx.font = "11px monospace";
+    ctx.fillText((state.silentGuard ? "0dB SILENT GUARD" : "LIVE SYNTH") + " | " + state.lastPlayedFreq.toFixed(1) + " Hz | Cutoff " + state.cutoffFreq + " Hz", 10, 15);
+  }
+
+  // =========================================================================
+  // 4. CIVILIZATION ECONOMY & AI AGENT ROSTER UI
+  // =========================================================================
+  function calcRates() {
+    let gRate = 15;
+    let sRate = 8;
+    let power = VEHICLES[state.selectedVehicle].power + state.extraUnits * 14;
+    state.placedBuildings.forEach((b) => {
+      const def = BUILDINGS[b.type];
+      if (def) {
+        gRate += def.goldPerTurn;
+        sRate += def.sciPerTurn;
+        power += def.power;
+      }
+    });
+    AI_AGENTS.filter(a => a.hired).forEach((a) => {
+      gRate += a.goldBonus;
+      sRate += a.sciBonus;
+      power += a.powerBonus;
+    });
+    return { gRate, sRate, power };
+  }
+
+  function updateCivHud() {
+    const rates = calcRates();
+    const hired = AI_AGENTS.filter(a => a.hired);
+    document.getElementById("hudGold").textContent = state.gold + " G (+" + rates.gRate + "/t)";
+    document.getElementById("hudScience").textContent = state.science + " (+" + rates.sRate + "/t)";
+    document.getElementById("hudPop").textContent = state.population.toLocaleString() + " · " + state.placedBuildings.length + " Bldgs";
+    document.getElementById("hudPower").textContent = rates.power + " PWR";
+    document.getElementById("hudAgents").textContent = hired.length + " / " + AI_AGENTS.length + " Hired";
+    document.getElementById("hudEraTurn").textContent = "Turn " + state.turn + " · Eon " + (state.eraIdx + 1);
+    document.getElementById("rosterPowerBonus").textContent = "+" + hired.reduce((s, a) => s + a.powerBonus, 0) + " Agent PWR";
+
+    const sumEl = document.getElementById("hiredAgentsSummary");
+    if (sumEl) {
+      sumEl.innerHTML = hired.map(a =>
+        "<span class=\"badge-pill cyan\">" + a.icon + " " + a.name + " (" + a.source + ")</span>"
+      ).join("");
+    }
+  }
+
+  function renderAgentMarket() {
+    const list = document.getElementById("aiAgentMarketList");
+    if (!list) return;
+    list.innerHTML = "";
+    AI_AGENTS.forEach((ag) => {
+      const row = document.createElement("div");
+      row.className = "agent-row" + (ag.hired ? " hired" : "");
+      row.innerHTML =
+        "<div>" +
+          "<div><strong>" + ag.icon + " " + ag.name + "</strong> <span style=\"color:var(--accent2);font-size:0.7rem;\">(" + ag.source + ")</span></div>" +
+          "<div style=\"color:var(--text-muted);font-size:0.71rem;\">" + ag.desc + "</div>" +
+        "</div>" +
+        "<button type=\"button\" class=\"btn " + (ag.hired ? "" : "btn-primary") + "\" data-buy-agent=\"" + ag.id + "\">" + (ag.hired ? "✓ In Roster" : "Buy (" + ag.cost + "G)") + "</button>";
+      list.appendChild(row);
+    });
+  }
+
+  // =========================================================================
+  // 5. THREE.JS 3D WORLD: BUILDINGS, VEHICLES & EON BATTLES
+  // =========================================================================
+  let scene = null;
+  let camera = null;
+  let renderer = null;
+  let groundMesh = null;
+  let buildingGroup = null;
+  let vehicleGroup = null;
+  let enemyGroup = null;
+  let strikeRing = null;
+  let raycaster = null;
+  let enemies = [];
+
+  function rebuild3DBuildings() {
+    if (!buildingGroup) return;
+    while (buildingGroup.children.length > 0) buildingGroup.remove(buildingGroup.children[0]);
+
+    state.placedBuildings.forEach((b) => {
+      const def = BUILDINGS[b.type] || BUILDINGS.market;
+      const mat = new THREE.MeshStandardMaterial({ color: def.color, roughness: 0.45, metalness: 0.2 });
+      const mesh = new THREE.Mesh(new THREE.BoxGeometry(1.8, def.height, 1.8), mat);
+      mesh.position.set(b.x, def.height / 2, b.z);
+      buildingGroup.add(mesh);
+
+      if (b.type === "fiber" || b.type === "mont") {
+        const spire = new THREE.Mesh(new THREE.ConeGeometry(0.65, 1.8, 6), new THREE.MeshStandardMaterial({ color: 0xD4AF37, metalness: 0.6 }));
+        spire.position.set(b.x, def.height + 0.9, b.z);
+        buildingGroup.add(spire);
+      }
+    });
+  }
+
+  function rebuildActiveVehicleMesh() {
+    if (!vehicleGroup) return;
+    while (vehicleGroup.children.length > 0) vehicleGroup.remove(vehicleGroup.children[0]);
+    const v = VEHICLES[state.selectedVehicle];
+    const mat = new THREE.MeshStandardMaterial({ color: v.color, roughness: 0.35, metalness: 0.45 });
+
+    if (state.selectedVehicle === "screw") {
+      const base = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 1.1, 0.35, 14), mat);
+      const rotor = new THREE.Mesh(new THREE.ConeGeometry(1.2, 0.9, 10), new THREE.MeshStandardMaterial({ color: 0xFEF3C7, wireframe: true }));
+      rotor.position.y = 0.85;
+      vehicleGroup.add(base);
+      vehicleGroup.add(rotor);
+    } else if (state.selectedVehicle === "jet") {
+      const fuse = new THREE.Mesh(new THREE.ConeGeometry(0.45, 2.2, 8), mat);
+      fuse.rotation.x = -Math.PI / 2;
+      const wings = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.12, 0.8), mat);
+      vehicleGroup.add(fuse);
+      vehicleGroup.add(wings);
+    } else {
+      const hull = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.65, 1.8), mat);
+      const turret = new THREE.Mesh(new THREE.SphereGeometry(0.45, 12, 12), new THREE.MeshStandardMaterial({ color: 0x00F5D4 }));
+      turret.position.y = 0.45;
+      vehicleGroup.add(hull);
+      vehicleGroup.add(turret);
+    }
+    document.getElementById("stageVehicleChip").textContent = "Active Vehicle: " + v.name;
+  }
+
+  function spawnBattleWave() {
+    if (!enemyGroup) return;
+    const eon = EONS[state.eraIdx];
+    for (let i = 0; i < 4; i++) {
+      const m = new THREE.Mesh(
+        new THREE.OctahedronGeometry(0.65, 0),
+        new THREE.MeshStandardMaterial({ color: 0xF43F5E, emissive: 0x881337 })
+      );
+      const ang = (i / 4) * Math.PI * 2 + Math.random();
+      m.position.set(Math.cos(ang) * 14, 0.9, Math.sin(ang) * 14);
+      enemyGroup.add(m);
+      enemies.push({ mesh: m, hp: 40 + state.eraIdx * 20 });
+    }
+    logEvent("⚔️ " + eon.enemyName + " launched an assault in " + eon.name + "! Press Space for Tactical Strike!");
+    showToast("Eon Battle Started: " + eon.enemyName + "!");
+    playArpeggioNote(293.66);
+  }
+
+  function executeTacticalStrike() {
+    state.strikePulse = 1.0;
+    const rates = calcRates();
+    const dmg = Math.round(rates.power * 0.65);
+    let defeated = 0;
+
+    for (let i = enemies.length - 1; i >= 0; i--) {
+      const en = enemies[i];
+      const dist = Math.hypot(en.mesh.position.x - state.vehX, en.mesh.position.z - state.vehZ);
+      if (dist < 10.5) {
+        en.hp -= dmg;
+        if (en.hp <= 0) {
+          enemyGroup.remove(en.mesh);
+          enemies.splice(i, 1);
+          defeated += 1;
+        }
+      }
+    }
+
+    if (defeated > 0) {
+      const reward = defeated * 45 + (enemies.length === 0 ? EONS[state.eraIdx].rewardGold : 0);
+      state.gold += reward;
+      state.science += defeated * 15;
+      logEvent("🎯 Tactical Strike (" + dmg + " DMG) neutralized " + defeated + " hostile unit(s)! Earned +" + reward + " Gold.");
+      showToast("Neutralized " + defeated + " enemy unit(s)! +" + reward + "G");
+      updateCivHud();
+    } else {
+      showToast("Fired Tactical Strike (" + dmg + " PWR)!");
+    }
+    playArpeggioNote(defeated > 0 ? 659.25 : 440);
+  }
+
+  function applyEraVisuals() {
+    const eon = EONS[state.eraIdx];
+    if (scene) {
+      scene.background = new THREE.Color(eon.sky);
+      scene.fog = new THREE.FogExp2(eon.fog, 0.018);
+    }
+    if (groundMesh) {
+      groundMesh.material.color.setHex(eon.ground);
+    }
+    document.getElementById("stageEraChip").textContent = "🌍 Eon: " + eon.name;
+    for (let i = 0; i < EONS.length; i++) {
+      document.getElementById("btnEra" + i).classList.toggle("active", i === state.eraIdx);
+    }
+    updateCivHud();
+  }
+
+  function initSaeculorum3D() {
+    const container = document.getElementById("saeculorum3DCanvas");
+    if (!container || typeof THREE === "undefined") return;
+
+    scene = new THREE.Scene();
+    const w = container.clientWidth || 760;
+    const h = container.clientHeight || 430;
+    camera = new THREE.PerspectiveCamera(58, w / h, 0.1, 160);
+
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(w, h);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    container.innerHTML = "";
+    container.appendChild(renderer.domElement);
+    raycaster = new THREE.Raycaster();
+
+    scene.add(new THREE.HemisphereLight(0xFFF3D6, 0x263244, 0.95));
+    const sun = new THREE.DirectionalLight(0xFFF1C9, 1.25);
+    sun.position.set(16, 28, 12);
+    scene.add(sun);
+
+    groundMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(38, 38),
+      new THREE.MeshStandardMaterial({ color: 0xB89B6A, roughness: 0.78 })
+    );
+    groundMesh.rotation.x = -Math.PI / 2;
+    scene.add(groundMesh);
+
+    const gridHelper = new THREE.GridHelper(36, 18, 0xD4AF37, 0x334155);
+    gridHelper.position.y = 0.02;
+    scene.add(gridHelper);
+
+    buildingGroup = new THREE.Group();
+    scene.add(buildingGroup);
+
+    vehicleGroup = new THREE.Group();
+    scene.add(vehicleGroup);
+
+    enemyGroup = new THREE.Group();
+    scene.add(enemyGroup);
+
+    strikeRing = new THREE.Mesh(
+      new THREE.RingGeometry(0.8, 1.2, 32),
+      new THREE.MeshBasicMaterial({ color: 0x00F5D4, side: THREE.DoubleSide, transparent: true, opacity: 0 })
+    );
+    strikeRing.rotation.x = -Math.PI / 2;
+    strikeRing.position.y = 0.15;
+    scene.add(strikeRing);
+
+    applyEraVisuals();
+    rebuild3DBuildings();
+    rebuildActiveVehicleMesh();
+
+    // Mouse Drag Orbit + Click Ground to Place Building
+    let dragging = false;
+    let px = 0;
+    let py = 0;
+    let moved = 0;
+
+    renderer.domElement.addEventListener("mousedown", function(e) {
+      dragging = true;
+      px = e.clientX;
+      py = e.clientY;
+      moved = 0;
+    });
+    window.addEventListener("mouseup", () => { dragging = false; });
+    window.addEventListener("mousemove", function(e) {
+      if (!dragging) return;
+      const dx = e.clientX - px;
+      const dy = e.clientY - py;
+      moved += Math.abs(dx) + Math.abs(dy);
+      px = e.clientX;
+      py = e.clientY;
+      state.camOrbitYaw -= dx * 0.006;
+      state.camPitch = Math.max(0.18, Math.min(1.05, state.camPitch + dy * 0.004));
+    });
+
+    renderer.domElement.addEventListener("click", function(e) {
+      if (moved > 8) return;
+      const rect = renderer.domElement.getBoundingClientRect();
+      const mouse = new THREE.Vector2(
+        ((e.clientX - rect.left) / rect.width) * 2 - 1,
+        -((e.clientY - rect.top) / rect.height) * 2 + 1
+      );
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObject(groundMesh);
+      if (hits.length > 0) {
+        const pt = hits[0].point;
+        const def = BUILDINGS[state.selectedBuilding];
+        if (state.gold < def.cost) {
+          showToast("Need " + def.cost + " Gold! Click Next Turn to collect revenue.");
+          return;
+        }
+        state.gold -= def.cost;
+        state.population += def.pop;
+        state.placedBuildings.push({ type: state.selectedBuilding, x: Math.round(pt.x), z: Math.round(pt.z) });
+        rebuild3DBuildings();
+        updateCivHud();
+        logEvent("🏗️ Built " + def.name + " at (" + Math.round(pt.x) + ", " + Math.round(pt.z) + ") for " + def.cost + "G.");
+        playArpeggioNote(523.25);
+        showToast("Built " + def.name + "!");
+      }
+    });
+
+    window.addEventListener("resize", function() {
+      if (!renderer || !camera || !container) return;
+      const nw = container.clientWidth || 760;
+      const nh = container.clientHeight || 430;
+      camera.aspect = nw / nh;
+      camera.updateProjectionMatrix();
+      renderer.setSize(nw, nh);
+    });
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      const v = VEHICLES[state.selectedVehicle];
+      if (state.keys.w) state.vehZ -= v.speed;
+      if (state.keys.s) state.vehZ += v.speed;
+      if (state.keys.a) state.vehX -= v.speed;
+      if (state.keys.d) state.vehX += v.speed;
+      state.vehX = Math.max(-15, Math.min(15, state.vehX));
+      state.vehZ = Math.max(-15, Math.min(15, state.vehZ));
+
+      vehicleGroup.position.set(state.vehX, v.altitude, state.vehZ);
+      vehicleGroup.rotation.y += state.selectedVehicle === "screw" ? 0.08 : 0.015;
+
+      // Move hostile units toward center capital
+      enemies.forEach((en) => {
+        const dx = -en.mesh.position.x;
+        const dz = -en.mesh.position.z;
+        const d = Math.hypot(dx, dz) || 1;
+        if (d > 2.2) {
+          en.mesh.position.x += (dx / d) * 0.03;
+          en.mesh.position.z += (dz / d) * 0.03;
+        }
+        en.mesh.rotation.y += 0.05;
+      });
+
+      // Animate Tactical Strike Ring
+      if (state.strikePulse > 0) {
+        state.strikePulse = Math.max(0, state.strikePulse - 0.035);
+        const s = 1 + (1 - state.strikePulse) * 9.5;
+        strikeRing.position.set(state.vehX, 0.15, state.vehZ);
+        strikeRing.scale.set(s, s, 1);
+        strikeRing.material.opacity = state.strikePulse * 0.85;
+      } else {
+        strikeRing.material.opacity = 0;
+      }
+
+      // Orbit Camera around the civilization
+      const camDist = 21;
+      camera.position.set(
+        Math.sin(state.camOrbitYaw) * camDist,
+        8 + state.camPitch * 14,
+        Math.cos(state.camOrbitYaw) * camDist
+      );
+      camera.lookAt(0, 1, 0);
+
+      renderer.render(scene, camera);
+    }
+    animate();
+  }
+
+  // =========================================================================
+  // 6. POSTURE & EVENT BINDINGS
+  // =========================================================================
+  function setDevicePosture(posture) {
+    [document.documentElement, document.body].forEach((el) => {
+      el.setAttribute("data-device", posture);
+      el.setAttribute("data-self-device", posture);
+      el.setAttribute("data-hx-device", posture);
+    });
+    const map = { desktop: "btnPostureDesktop", mobile: "btnPostureMobile", fold: "btnPostureFold", tablet: "btnPostureTablet" };
+    Object.keys(map).forEach((k) => {
+      const b = document.getElementById(map[k]);
+      if (b) b.classList.toggle("active", k === posture);
+    });
+    setTimeout(() => window.dispatchEvent(new Event("resize")), 260);
+    showToast("Posture switched to " + posture.toUpperCase());
+  }
+
+  function bindAllControls() {
+    document.getElementById("btnPostureDesktop").addEventListener("click", () => setDevicePosture("desktop"));
+    document.getElementById("btnPostureMobile").addEventListener("click", () => setDevicePosture("mobile"));
+    document.getElementById("btnPostureFold").addEventListener("click", () => setDevicePosture("fold"));
+    document.getElementById("btnPostureTablet").addEventListener("click", () => setDevicePosture("tablet"));
+
+    const uiSel = document.getElementById("uiThemeSelect");
+    uiSel.addEventListener("change", () => {
+      document.documentElement.setAttribute("data-ui-theme", uiSel.value);
+      showToast("Theme: " + uiSel.options[uiSel.selectedIndex].text);
+    });
+
+    const btnGuard = document.getElementById("btnToggleAudioGuard");
+    btnGuard.addEventListener("click", function() {
+      state.silentGuard = !state.silentGuard;
+      btnGuard.textContent = state.silentGuard ? "🔇 0dB Silent: ON" : "🔊 Live Synth: ON";
+      btnGuard.classList.toggle("active", !state.silentGuard);
+      drawWaveCanvas();
+    });
+
+    // Era Switchers
+    for (let i = 0; i < EONS.length; i++) {
+      document.getElementById("btnEra" + i).addEventListener("click", () => {
+        state.eraIdx = i;
+        applyEraVisuals();
+        logEvent("🌍 Shifted civilization timeline to " + EONS[i].name + ".");
+        showToast("Entered " + EONS[i].name);
+      });
+    }
+
+    // Turn & Battle Controls
+    document.getElementById("btnNextTurn").addEventListener("click", function() {
+      const rates = calcRates();
+      state.turn += 1;
+      state.gold += rates.gRate;
+      state.science += rates.sRate;
+      state.population += 450;
+      updateCivHud();
+      logEvent("⏭️ Turn " + state.turn + ": Collected +" + rates.gRate + " Gold and +" + rates.sRate + " Science.");
+      playArpeggioNote(440);
+    });
+
+    document.getElementById("btnLaunchBattle").addEventListener("click", spawnBattleWave);
+    document.getElementById("btnTacticalStrike").addEventListener("click", executeTacticalStrike);
+
+    // Building Selector Buttons
+    const buildMap = [
+      { id: "btnBuildMarket", key: "market" },
+      { id: "btnBuildLibrary", key: "library" },
+      { id: "btnBuildMont", key: "mont" },
+      { id: "btnBuildChapel", key: "chapel" },
+      { id: "btnBuildForge", key: "forge" },
+      { id: "btnBuildFiber", key: "fiber" }
+    ];
+    buildMap.forEach((b) => {
+      document.getElementById(b.id).addEventListener("click", () => {
+        state.selectedBuilding = b.key;
+        buildMap.forEach(o => document.getElementById(o.id).classList.toggle("active", o.id === b.id));
+        showToast("Click the 3D ground to place " + BUILDINGS[b.key].name + " (" + BUILDINGS[b.key].cost + "G)");
+      });
+    });
+
+    // Vehicle Selector Buttons
+    const vehMap = [
+      { id: "btnVehScrew", key: "screw" },
+      { id: "btnVehTank", key: "tank" },
+      { id: "btnVehMoto", key: "moto" },
+      { id: "btnVehApc", key: "apc" },
+      { id: "btnVehJet", key: "jet" }
+    ];
+    vehMap.forEach((v) => {
+      document.getElementById(v.id).addEventListener("click", () => {
+        state.selectedVehicle = v.key;
+        vehMap.forEach(o => document.getElementById(o.id).classList.toggle("active", o.id === v.id));
+        rebuildActiveVehicleMesh();
+        updateCivHud();
+        showToast("Piloting " + VEHICLES[v.key].name + "!");
+      });
+    });
+
+    document.getElementById("btnSpawnUnit").addEventListener("click", function() {
+      if (state.gold < 80) {
+        showToast("Need 80 Gold to deploy an extra combat unit!");
+        return;
+      }
+      state.gold -= 80;
+      state.extraUnits += 1;
+      updateCivHud();
+      logEvent("🚀 Deployed additional " + VEHICLES[state.selectedVehicle].name + " squadron (+14 PWR).");
+      showToast("Deployed extra unit (+14 PWR)!");
+    });
+
+    // Buy AI Agents Marketplace (Delegated)
+    document.getElementById("aiAgentMarketList").addEventListener("click", function(e) {
+      const btn = e.target.closest("[data-buy-agent]");
+      if (!btn) return;
+      const ag = AI_AGENTS.find(a => a.id === btn.getAttribute("data-buy-agent"));
+      if (!ag || ag.hired) return;
+      if (state.gold < ag.cost) {
+        showToast("Need " + ag.cost + " Gold to recruit " + ag.name + "!");
+        return;
+      }
+      state.gold -= ag.cost;
+      ag.hired = true;
+      renderAgentMarket();
+      updateCivHud();
+      logEvent("🤖 Recruited AI Agent " + ag.name + " (" + ag.source + ") into your civilization roster!");
+      playArpeggioNote(587.33);
+      showToast("Recruited " + ag.name + "!");
+    });
+
+    // Export Civ Save & Reset
+    document.getElementById("btnExportCivSave").addEventListener("click", function() {
+      const save = {
+        app: "Project Saeculorum.Alpha",
+        turn: state.turn,
+        era: EONS[state.eraIdx].name,
+        gold: state.gold,
+        science: state.science,
+        buildings: state.placedBuildings,
+        hiredAgents: AI_AGENTS.filter(a => a.hired).map(a => a.name)
+      };
+      try {
+        const blob = new Blob([JSON.stringify(save, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "project_saeculorum_alpha_save.json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1200);
+        showToast("Exported Project Saeculorum.Alpha save (.JSON)!");
+      } catch (e) {}
+    });
+
+    document.getElementById("btnResetCiv").addEventListener("click", function() {
+      state.turn = 1;
+      state.gold = 450;
+      state.science = 120;
+      state.population = 12400;
+      state.extraUnits = 1;
+      state.placedBuildings = [
+        { type: "library", x: -4.5, z: -3.5 },
+        { type: "mont", x: 4.5, z: -3.5 },
+        { type: "market", x: 0, z: 3.5 }
+      ];
+      AI_AGENTS.forEach((a, i) => { a.hired = i === 0; });
+      rebuild3DBuildings();
+      renderAgentMarket();
+      updateCivHud();
+      logEvent("↺ Founded a new Project Saeculorum.Alpha civilization.");
+      showToast("Civilization reset!");
+    });
+
+    // Keyboard Vehicle Driving & Tactical Strike
+    window.addEventListener("keydown", function(e) {
+      const k = e.key.toLowerCase();
+      if (k === "w" || e.key === "ArrowUp") state.keys.w = true;
+      if (k === "s" || e.key === "ArrowDown") state.keys.s = true;
+      if (k === "a" || e.key === "ArrowLeft") state.keys.a = true;
+      if (k === "d" || e.key === "ArrowRight") state.keys.d = true;
+      if (e.key === " ") { e.preventDefault(); executeTacticalStrike(); }
+    });
+    window.addEventListener("keyup", function(e) {
+      const k = e.key.toLowerCase();
+      if (k === "w" || e.key === "ArrowUp") state.keys.w = false;
+      if (k === "s" || e.key === "ArrowDown") state.keys.s = false;
+      if (k === "a" || e.key === "ArrowLeft") state.keys.a = false;
+      if (k === "d" || e.key === "ArrowRight") state.keys.d = false;
+    });
+
+    // Preserved #hawkStudioRoot
+    document.getElementById("btnTriggerArp").addEventListener("click", () => {
+      [0, 2, 4, 7].forEach((deg, idx) => setTimeout(() => playArpeggioNote(getModalFrequency(deg)), idx * 105));
+    });
+    document.getElementById("scaleModeSelect").addEventListener("change", (e) => {
+      state.scaleMode = e.target.value;
+      playArpeggioNote(getModalFrequency(0));
+    });
+    document.getElementById("cutoffKnob").addEventListener("input", (e) => {
+      state.cutoffFreq = Number(e.target.value) || 2400;
+      drawWaveCanvas();
+    });
+  }
+
+  window.addEventListener("DOMContentLoaded", function() {
+    bindAllControls();
+    renderAgentMarket();
+    updateCivHud();
+    drawWaveCanvas();
+    initSaeculorum3D();
+    logEvent("🌍 Project Saeculorum.Alpha initialized! Click the 3D ground to place HawkSuite buildings, buy AI Agents on the right, or launch an Eon Battle.");
+  });
+})();
+</script>
+</body>
+</html>
